@@ -3,24 +3,43 @@
 
 import re
 import os
+import sys
 import ConfigParser
 import urllib2
 import xml.etree.ElementTree as ET
 import subprocess
 
 config = ConfigParser.RawConfigParser()
-config.readfp(open(r'settings.conf'))
-username = config.get('Main', 'username')
-password = config.get('Main', 'password')
+try:
+    config.readfp(open(r'settings.conf'))
+except IOError as e:
+    print "Can't find settings.conf! Please create it"
+    print "I/O error ({0}): {1}".format(e.errno, e.strerror)
+    sys.exit(1)
+
+try:
+    username = config.get('Main', 'username')
+    password = config.get('Main', 'password')
+except (ConfigParser.NoSectionError, ConfigParser.NoOptionError) as e:
+    print "Error in your settings.conf file:"
+    print e
+    sys.exit(1)
 
 out_dir = "files/"
 if not os.path.exists(os.path.dirname(out_dir)):
     os.makedirs(os.path.dirname(out_dir))
 
-url = 'http://xmltv.s-tv.ru/pers/%s/index.php?pass=%s' % (username, password)
+url = 'http://xmltv.s-tv.ru/pers/{0}/index.php?pass={1}'.format(username, 
+                                                                password)
 
 file = "stv.xml"
-response = urllib2.urlopen(url)
+try:
+    response = urllib2.urlopen(url)
+except urllib2.HTTPError as e:
+    print e
+    print "Probably wrong username and/or password. Check your settings.conf."
+    sys.exit(1)
+
 with open(file, 'wb') as f:
     f.write(response.read())
 
@@ -28,7 +47,8 @@ tree = ET.parse(file)
 root = tree.getroot()
 procs = []
 
-print "Downloading EPG files for %s channels. Please wait a bit" % (len(root))
+channels = len(root)
+print "Downloading EPG files for {0} channels. Please wait...".format(channels)
 
 for child in root:
     channel_src = re.sub('&sh=.*', '', child.attrib['src'])
