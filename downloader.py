@@ -29,7 +29,7 @@ out_dir = "files/"
 if not os.path.exists(os.path.dirname(out_dir)):
     os.makedirs(os.path.dirname(out_dir))
 
-url = 'http://xmltv.s-tv.ru/pers/{0}/index.php?pass={1}'.format(username, 
+url = 'http://xmltv.s-tv.ru/pers/{0}/index.php?pass={1}'.format(username,
                                                                 password)
 
 try:
@@ -40,6 +40,9 @@ except urllib2.HTTPError as e:
     sys.exit(1)
 
 xml_doc = response.read()
+
+# Here we parse the text in 'xml_doc' as a string, which creates an Element, and
+# then create an ElementTree using that Element.
 tree = ET.ElementTree(ET.fromstring(xml_doc))
 root = tree.getroot()
 procs = []
