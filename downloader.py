@@ -32,7 +32,6 @@ if not os.path.exists(os.path.dirname(out_dir)):
 url = 'http://xmltv.s-tv.ru/pers/{0}/index.php?pass={1}'.format(username, 
                                                                 password)
 
-file = "stv.xml"
 try:
     response = urllib2.urlopen(url)
 except urllib2.HTTPError as e:
@@ -40,13 +39,10 @@ except urllib2.HTTPError as e:
     print "Probably wrong username and/or password. Check your settings.conf."
     sys.exit(1)
 
-with open(file, 'wb') as f:
-    f.write(response.read())
-
-tree = ET.parse(file)
+xml_doc = response.read()
+tree = ET.ElementTree(ET.fromstring(xml_doc))
 root = tree.getroot()
 procs = []
-
 channels = len(root)
 print "Downloading EPG files for {0} channels. Please wait...".format(channels)
 
@@ -58,5 +54,4 @@ for child in root:
 for proc in procs:
     proc.wait()
 
-os.remove(file)
 print "All done. Have a nice day!"
