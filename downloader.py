@@ -8,6 +8,7 @@ import ConfigParser
 import urllib2
 import xml.etree.ElementTree as ET
 import subprocess
+from time import strftime
 
 config = ConfigParser.RawConfigParser()
 try:
@@ -53,7 +54,7 @@ for child in root:
     channel_src = re.sub('&sh=.*', '', child.attrib['src'])
     channel_id = child.attrib['channel_id']
     procs.append(subprocess.Popen(['/usr/bin/curl', '-s', '-o',
-                                  out_dir+"/"+channel_id+".xml", channel_src]))
+                                  out_dir+"/"+strftime("%Y-%m-%d_%H-%M-%S_")+channel_id+".xml", channel_src]))
 for proc in procs:
     proc.wait()
 
