@@ -55,10 +55,15 @@ def main():
     for child in root:
         channel_src = re.sub('&sh=.*', '', child.attrib['src'])
         channel_id = child.attrib['channel_id']
-        procs.append(subprocess.Popen(['/usr/bin/curl', '-s', '-o',
-                                      out_dir + "/" +
-                                      strftime("%Y-%m-%d_%H-%M-%S_") +
-                                      channel_id + ".xml", channel_src]))
+        try:
+            procs.append(subprocess.Popen(['/usr/bin/curl', '-s', '-o',
+                                           out_dir + "/" +
+                                           strftime("%Y-%m-%d_%H-%M-%S_") +
+                                           channel_id + ".xml", channel_src]))
+        except OSError as e:
+            print("Looks like there is no curl installed in your system :(")
+            sys.exit(1)
+
     for proc in procs:
         proc.wait()
 
