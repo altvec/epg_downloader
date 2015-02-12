@@ -1,7 +1,7 @@
 # Simple EPG downloader
 
-Username and Password for the s-tv.ru service are stored in external
-configuration file - settings.conf
+EPG files are downloaded from s-tv.ru service. Username and Password are stored
+in the settings.conf file.
 
 The file must contain following:
 ```
@@ -9,3 +9,6 @@ The file must contain following:
 username = %your_user_name%
 password = %your_password%
 ```
+
+Internally this program uses curl, so be sure that it is installed in your
+system.
